@@ -10,6 +10,7 @@ import {
 } from "react-native"
 import React, { useEffect, useState } from "react"
 import BleManager from "react-native-ble-manager"
+import { verificar_permissao_BT, LowEnergy } from "./Bluetooh"
 
 const ConnectionDevice = () => {
   const [isScanning, setIsScanning] = useState(false)
@@ -91,12 +92,25 @@ const ConnectionDevice = () => {
     })
   }
 
+  const testeConection = async (device: any) => {
+    const hasPermission = await verificar_permissao_BT("conectar")
+    if (hasPermission) {
+      const lowEnergyDevice = new LowEnergy(device.id)
+      await lowEnergyDevice.iniciar_conexao()
+    } else {
+      console.log("Permissão necessária para conectar ao dispositivo.")
+    }
+  }
+
   const renderItem = ({ item, i }: any) => {
     return (
       <View style={styles.bleCard}>
         <Text style={styles.bleTxt}>{item.name}</Text>
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => testeConection(item)}
+        >
           <Text style={styles.btnText}>Connect</Text>
         </TouchableOpacity>
       </View>
